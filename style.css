@@ -85,6 +85,10 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.nav-significance {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -495,6 +499,34 @@ body {
 .significance {
     background: white;
     border-left: 6px solid #fbc2eb;
+}
+
+/* Ý nghĩa & Sức ảnh hưởng section */
+.significance-section {
+    background: white;
+    border-left: 6px solid #f5576c;
+}
+
+.significance-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+    margin-top: 30px;
+}
+
+.significance-images {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.significance-images .gallery-item img {
+    height: 250px;
+}
+
+.significance-text .detail-box p {
+    font-size: 1.1em;
 }
 
 .content-box {
