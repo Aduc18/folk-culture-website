@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chúc Mừng Sinh Nhật 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #f5c842;
+    --gold-light: #fde68a;
+    --pink: #f472b6;
+    --pink-light: #fce7f3;
+    --cream: #fffbeb;
+    --dark: #1a0a0a;
+  }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: #1a0a2e;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== CANVAS PARTICLES ===== */
+  #canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== SPLASH SCREEN ===== */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #1a0a2e 0%, #2d1154 50%, #1a0a2e 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  #splash.hide {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  .splash-stars {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s infinite alternate;
+  }
+
+  @keyframes twinkle {
+    from { opacity: 0.2; transform: scale(0.8); }
+    to   { opacity: 1;   transform: scale(1.2); }
+  }
+
+  .splash-envelope {
+    width: 160px;
+    height: 120px;
+    position: relative;
+    cursor: pointer;
+    filter: drop-shadow(0 0 30px rgba(245,200,66,0.6));
+    animation: float 3s ease-in-out infinite;
+    margin-bottom: 24px;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-14px); }
+  }
+
+  .env-body {
+    width: 160px;
+    height: 100px;
+    background: linear-gradient(160deg, #fde68a 0%, #f5c842 100%);
+    border-radius: 4px 4px 8px 8px;
+    position: absolute;
+    bottom: 0;
+    box-shadow: 0 8px 32px rgba(245,200,66,0.4);
+  }
+
+  .env-flap {
+    width: 0;
+    height: 0;
+    border-left: 80px solid transparent;
+    border-right: 80px solid transparent;
+    border-top: 60px solid #f9a825;
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    transform-origin: top center;
+    transition: transform 0.5s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+
+  .env-flap.open {
+    transform: rotateX(180deg);
+  }
+
+  .env-left {
+    width: 0; height: 0;
+    border-bottom: 50px solid #fbbf24;
+    border-right: 80px solid transparent;
+    position: absolute; bottom: 0; left: 0;
+  }
+
+  .env-right {
+    width: 0; height: 0;
+    border-bottom: 50px solid #f59e0b;
+    border-left: 80px solid transparent;
+    position: absolute; bottom: 0; right: 0;
+  }
+
+  .env-bottom {
+    width: 0; height: 0;
+    border-left: 80px solid transparent;
+    border-right: 80px solid transparent;
+    border-bottom: 60px solid #fcd34d;
+    position: absolute; bottom: 0;
+  }
+
+  .splash-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2rem;
+    color: var(--gold-light);
+    text-align: center;
+    text-shadow: 0 0 20px rgba(245,200,66,0.8);
+    margin-bottom: 8px;
+  }
+
+  .splash-sub {
+    color: rgba(253,230,138,0.7);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-open {
+    background: linear-gradient(135deg, #f5c842, #f472b6);
+    color: white;
+    border: none;
+    padding: 14px 42px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(245,200,66,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-open:hover {
+    transform: scale(1.06);
+    box-shadow: 0 8px 32px rgba(245,200,66,0.7);
+  }
+
+  /* ===== MAIN CARD ===== */
+  #main {
+    position: relative;
+    z-index: 10;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  #main.show {
+    display: flex;
+  }
+
+  .card {
+    background: linear-gradient(160deg, #fffbf0 0%, #fff5f8 100%);
+    border: 3px solid var(--gold);
+    border-radius: 20px;
+    padding: 36px 32px 28px;
+    max-width: 440px;
+    width: 100%;
+    position: relative;
+    box-shadow:
+      0 0 0 6px rgba(245,200,66,0.15),
+      0 20px 60px rgba(0,0,0,0.4);
+    animation: cardIn 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.7) translateY(40px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Gold corner ornaments */
+  .card::before, .card::after,
+  .card .corner-br, .card .corner-bl {
+    content: '✦';
+    position: absolute;
+    color: var(--gold);
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  .card::before  { top: 10px; left: 14px; }
+  .card::after   { top: 10px; right: 14px; }
+  .card .corner-br { bottom: 10px; right: 14px; }
+  .card .corner-bl { bottom: 10px; left: 14px; }
+
+  .card-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .to-label {
+    font-size: 0.78rem;
+    color: #9d7c3a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .recipient-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.4rem;
+    color: #c2790a;
+    text-shadow: 0 2px 8px rgba(194,121,10,0.2);
+    line-height: 1.1;
+  }
+
+  .hbd-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: var(--pink);
+    margin-top: 4px;
+  }
+
+  /* Photo grid */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 150px 170px;
+    gap: 6px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--gold-light);
+  }
+
+  .photo-grid .photo {
+    overflow: hidden;
+    position: relative;
+    background: #f0e8d0;
+  }
+
+  /* Photo 2 (landscape) spans full top row */
+  .photo-grid .photo:nth-child(1) {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  /* Photos 1, 3, 4 in bottom row */
+  .photo-grid .photo:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .photo-grid .photo:nth-child(3) { grid-column: 2; grid-row: 2; }
+  .photo-grid .photo:nth-child(4) { grid-column: 3; grid-row: 2; }
+
+  .photo-grid .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .photo-grid .photo:hover img {
+    transform: scale(1.06);
+  }
+
+  /* Cat mascot */
+  .cat-mascot {
+    position: absolute;
+    bottom: -18px;
+    right: -18px;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    animation: catBounce 1.5s ease-in-out infinite;
+    z-index: 5;
+  }
+
+  @keyframes catBounce {
+    0%,100% { transform: translateY(0) rotate(-5deg); }
+    50%      { transform: translateY(-8px) rotate(5deg); }
+  }
+
+  /* Message */
+  .message-box {
+    background: linear-gradient(135deg, rgba(245,200,66,0.08), rgba(244,114,182,0.08));
+    border: 1.5px solid rgba(245,200,66,0.4);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+
+  .message-text {
+    font-size: 0.88rem;
+    color: #5a3e1b;
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  .message-text .highlight {
+    color: var(--pink);
+    font-weight: 600;
+  }
+
+  .half-age {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #c2790a;
+    background: linear-gradient(90deg, #f5c842, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0;
+    color: var(--gold);
+    font-size: 0.9rem;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* Wishes list */
+  .wishes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .wish-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 2px 8px rgba(245,200,66,0.12);
+    border-left: 3px solid var(--gold);
+    font-size: 0.85rem;
+    color: #5a3e1b;
+    animation: slideIn 0.5s ease forwards;
+    opacity: 0;
+  }
+
+  .wish-item:nth-child(1) { animation-delay: 0.8s; }
+  .wish-item:nth-child(2) { animation-delay: 1.0s; }
+  .wish-item:nth-child(3) { animation-delay: 1.2s; }
+  .wish-item:nth-child(4) { animation-delay: 1.4s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .wish-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+  /* Signature */
+  .signature {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .sig-from {
+    font-size: 0.75rem;
+    color: #9d7c3a;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .sig-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #c2790a;
+  }
+
+  /* Replay button */
+  .btn-replay {
+    display: block;
+    margin: 16px auto 0;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: #9d7c3a;
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-replay:hover {
+    background: var(--gold);
+    color: white;
+  }
+
+  /* ===== CHERRY BLOSSOMS ===== */
+  .petal {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50% 0 50% 0;
+    pointer-events: none;
+    z-index: 50;
+    animation: fall linear infinite;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-stars" id="splashStars"></div>
+
+  <div class="splash-envelope" id="envelope">
+    <div class="env-flap" id="envFlap"></div>
+    <div class="env-body">
+      <div class="env-left"></div>
+      <div class="env-right"></div>
+      <div class="env-bottom"></div>
+    </div>
+  </div>
+
+  <div class="splash-title">✨ Có thư gửi đến bạn ✨</div>
+  <div class="splash-sub">Một món quà nhỏ từ trái tim 💛</div>
+  <button class="btn-open" onclick="openLetter()">💌 Mở thư ra nào!</button>
+</div>
+
+<!-- MAIN CARD -->
+<div id="main">
+  <div class="card" id="card">
+    <span class="corner-br">✦</span>
+    <span class="corner-bl">✦</span>
+
+    <div class="card-header">
+      <div class="to-label">✦ Gửi đến ✦</div>
+      <div class="recipient-name" id="recipientName">Người Đặc Biệt</div>
+      <div class="hbd-text">🎂 Happy Birthday! 🎉</div>
+    </div>
+
+    <div style="position:relative;">
+      <div class="photo-grid">
+        <div class="photo"><img src="photo2.jpg" alt="Đan Lê"></div>
+        <div class="photo"><img src="photo1.jpg" alt="Đan Lê" style="object-position:center center;"></div>
+        <div class="photo"><img src="photo3.jpg" alt="Đan Lê" style="object-position:center 20%;"></div>
+        <div class="photo"><img src="photo4.jpg" alt="Đan Lê" style="object-position:center top;"></div>
+      </div>
+      <img src="guma.jpg" class="cat-mascot" alt="Guma" onerror="this.style.display='none'">
+    </div>
+
+    <div class="message-box">
+      <div class="message-text">
+        Chúc mừng sinh nhật <span class="highlight" id="nameInMsg">bạn</span>! 🌟<br>
+        <span class="half-age">một nửa 36 ‼</span><br>
+        Hôm nay là một ngày thật đặc biệt —<br>
+        ngày mà cả thế giới vui vì <span class="highlight">bạn đã có mặt</span>. 💛<br>
+        Mong mỗi điều ước của bạn đều thành hiện thực! ✨
+      </div>
+    </div>
+
+    <div class="divider">🌸 Những lời chúc 🌸</div>
+
+    <div class="wishes">
+      <div class="wish-item"><span class="wish-icon">🌸</span> Luôn luôn hạnh phúc, vui vẻ, xinh đẹp, yêu đời</div>
+      <div class="wish-item"><span class="wish-icon">🏆</span> Đậu nguyện vọng 1, thủ khoa A00</div>
+      <div class="wish-item"><span class="wish-icon">💘</span> 8386</div>
+      <div class="wish-item"><span class="wish-icon">🤔</span> .... không biết chúc gì thêm =))))</div>
+      <div class="wish-item"><span class="wish-icon">🙏</span> Đừng slient treatment nữa nge mi</div>
+    </div>
+
+    <div class="signature">
+      <div class="sig-from">— Từ —</div>
+      <div class="sig-name" id="senderName">Người bạn thân 💕</div>
+    </div>
+
+    <button class="btn-replay" onclick="replayFireworks()">🎆 Pháo hoa lần nữa!</button>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const CONFIG = {
+  recipient: 'Nguyễn Đan Lê',      // ← Đổi tên người nhận
+  sender: 'Vk Aduc',                 // ← Đổi tên người gửi
+};
+
+// Apply config
+document.getElementById('recipientName').textContent = CONFIG.recipient;
+document.getElementById('nameInMsg').textContent = CONFIG.recipient;
+document.getElementById('senderName').textContent = CONFIG.sender;
+
+// ===== STARS =====
+const starsContainer = document.getElementById('splashStars');
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 3 + 1;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    top:${Math.random()*100}%; left:${Math.random()*100}%;
+    animation-delay:${Math.random()*3}s;
+    animation-duration:${Math.random()*2+1.5}s;
+    opacity:${Math.random()*0.6+0.2};
+  `;
+  starsContainer.appendChild(s);
+}
+
+// ===== CANVAS FIREWORKS =====
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+let particles = [];
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    this.color = color;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 8 + 2;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.alpha = 1;
+    this.radius = Math.random() * 3 + 1;
+    this.gravity = 0.15;
+    this.drag = 0.98;
+  }
+  update() {
+    this.vx *= this.drag;
+    this.vy *= this.drag;
+    this.vy += this.gravity;
+    this.x += this.vx; this.y += this.vy;
+    this.alpha -= 0.018;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+const COLORS = ['#f5c842','#f472b6','#fb7185','#a78bfa','#38bdf8','#34d399','#fde68a','#ffffff'];
+
+function launchFirework(x, y) {
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  for (let i = 0; i < 80; i++) particles.push(new Particle(x, y, color));
+}
+
+function autoFireworks() {
+  const bursts = 5;
+  for (let i = 0; i < bursts; i++) {
+    setTimeout(() => {
+      launchFirework(
+        canvas.width * (0.2 + Math.random() * 0.6),
+        canvas.height * (0.1 + Math.random() * 0.5)
+      );
+    }, i * 350);
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ===== CHERRY BLOSSOMS =====
+function createPetals() {
+  const colors = ['#ffb7c5','#ffc0cb','#ff91a4','#ffdde1','#ffaec0'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const size = Math.random() * 8 + 6;
+    p.style.cssText = `
+      left: ${Math.random()*100}vw;
+      width: ${size}px; height: ${size}px;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      opacity: ${Math.random()*0.6+0.4};
+      animation-duration: ${Math.random()*5+5}s;
+      animation-delay: ${Math.random()*6}s;
+    `;
+    document.body.appendChild(p);
+  }
+}
+
+// ===== OPEN LETTER =====
+function openLetter() {
+  document.getElementById('envFlap').classList.add('open');
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('main').classList.add('show');
+      autoFireworks();
+      createPetals();
+    }, 800);
+  }, 500);
+}
+
+function replayFireworks() {
+  autoFireworks();
+}
+
+// Click anywhere on splash to open
+document.getElementById('splash').addEventListener('click', openLetter);
+</script>
+</body>
+</html>
